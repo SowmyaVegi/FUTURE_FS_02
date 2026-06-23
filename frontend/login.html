@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Mini CRM Login</title>
+
+<link rel="stylesheet" href="style.css">
+
+<style>
+
+body{
+    margin:0;
+    padding:0;
+    font-family:'Segoe UI',sans-serif;
+    background:linear-gradient(135deg,#020617,#0f172a,#111827);
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+}
+
+.login-container{
+    width:400px;
+    background:#111827;
+    padding:40px;
+    border-radius:20px;
+    box-shadow:0 0 25px rgba(0,0,0,0.5);
+}
+
+.login-container h1{
+    text-align:center;
+    color:#38bdf8;
+    margin-bottom:30px;
+}
+
+.input-group{
+    margin-bottom:20px;
+}
+
+.input-group label{
+    color:#cbd5e1;
+    display:block;
+    margin-bottom:8px;
+}
+
+.input-group input{
+    width:100%;
+    padding:12px;
+    border:none;
+    border-radius:10px;
+    background:#1e293b;
+    color:white;
+    font-size:16px;
+}
+
+.login-btn{
+    width:100%;
+    padding:14px;
+    background:#38bdf8;
+    border:none;
+    border-radius:10px;
+    color:white;
+    font-size:16px;
+    cursor:pointer;
+    transition:0.3s;
+}
+
+.login-btn:hover{
+    background:#0ea5e9;
+}
+
+.register-link{
+    text-align:center;
+    margin-top:15px;
+    color:#94a3b8;
+}
+
+.register-link a{
+    color:#38bdf8;
+    text-decoration:none;
+}
+
+.message{
+    text-align:center;
+    margin-top:15px;
+    color:#22c55e;
+}
+
+.error{
+    color:#ef4444;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="login-container">
+
+<h1>Mini CRM</h1>
+
+<form id="loginForm">
+
+<div class="input-group">
+<label>Username</label>
+<input
+type="text"
+id="username"
+required
+>
+</div>
+
+<div class="input-group">
+<label>Password</label>
+<input
+type="password"
+id="password"
+required
+>
+</div>
+
+<button
+type="submit"
+class="login-btn"
+>
+Login
+</button>
+
+</form>
+
+<div id="msg" class="message"></div>
+
+<div class="register-link">
+New User?
+<a href="#" onclick="registerUser()">
+Register
+</a>
+</div>
+
+</div>
+
+<script>
+
+const API = "http://localhost:5000/api/auth";
+
+document
+.getElementById("loginForm")
+.addEventListener("submit", loginUser);
+
+async function loginUser(e){
+
+e.preventDefault();
+
+const username =
+document.getElementById("username").value;
+
+const password =
+document.getElementById("password").value;
+
+const response = await fetch(
+`${API}/login`,
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+username,
+password
+})
+}
+);
+
+const data = await response.json();
+
+const msg =
+document.getElementById("msg");
+
+if(response.ok){
+
+msg.innerHTML =
+"✅ Login Successful";
+
+localStorage.setItem(
+"user",
+username
+);
+
+setTimeout(()=>{
+window.location.href =
+"dashboard.html";
+},1000);
+
+}
+else{
+
+msg.classList.add("error");
+
+msg.innerHTML =
+"❌ " + data.message;
+
+}
+
+}
+
+async function registerUser(){
+
+const username =
+document.getElementById("username").value;
+
+const password =
+document.getElementById("password").value;
+
+if(!username || !password){
+alert("Enter Username & Password");
+return;
+}
+
+const response = await fetch(
+`${API}/register`,
+{
+method:"POST",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify({
+username,
+password
+})
+}
+);
+
+const data = await response.json();
+
+const msg =
+document.getElementById("msg");
+
+if(response.ok){
+
+msg.classList.remove("error");
+
+msg.innerHTML =
+"✅ Registration Successful";
+
+}
+else{
+
+msg.classList.add("error");
+
+msg.innerHTML =
+"❌ " + data.message;
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
